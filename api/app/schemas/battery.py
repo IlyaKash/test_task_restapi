@@ -1,7 +1,5 @@
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional, List, ClassVar
-from datetime import datetime
-from decimal import Decimal
 import re
 
 class BatteryBase(BaseModel):
@@ -170,3 +168,15 @@ class Battery(BatteryBase):
             }
         }
     )
+
+#Для ответа списка батарей
+class BatteryList(BaseModel):
+    devices: List[Battery]
+    total: int
+    skip: int = 0
+    limit: int = 100
+
+class BatteryResponse(BaseModel):
+    success: Optional[bool]=True
+    data: Optional[Battery]
+    message: Optional[str]=""

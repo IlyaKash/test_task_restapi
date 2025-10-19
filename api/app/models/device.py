@@ -1,21 +1,21 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, validates
-from app.database import Base
+from database import Base
 
 class Device(Base):
     """
-    Модель данных сущности Устройство
-    Содержит:
-    id - идентификатор(первичный ключ)
-    name - уникальное название
-    firmware_version - версия прошивки
+    Модель данных сущности Устройство\n
+    Содержит:\n
+    id - идентификатор(первичный ключ)\n
+    name - уникальное название\n
+    firmware_version - версия прошивки\n
     is_active - состояние вкл/выкл
 
-    Device Entity Data Model
-    Contains:
-    id - identifier (primary key)
-    name - unique name
-    firmware_version - firmware version
+    Device Entity Data Model\n
+    Contains:\n
+    id - identifier (primary key)\n
+    name - unique name\n
+    firmware_version - firmware version\n
     is_active - on/off status
     """
     __tablename__="devices"

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, ClassVar
+from .battery import Battery
 
 class DeviceBase(BaseModel):
     #Нзвание устройства в пределах от 1 до 100 символов, содержит примеры и описание
@@ -123,3 +124,9 @@ class DeviceList(BaseModel):
     total: int
     skip: int = 0
     limit: int = 100
+
+
+class DeviceResponse(BaseModel):
+    success: Optional[bool]=True
+    data: Optional[Device]
+    message: Optional[str]=""

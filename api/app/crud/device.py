@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.models.device import Device
-from app.schemas.device import DeviceCreate, DevicePatch, DeviceUpdate, DeviceList
+from models.device import Device
+from schemas.device import DeviceCreate, DevicePatch, DeviceUpdate, DeviceList
 
 class DeviceCRUD:
     def __init__(self, session: AsyncSession):
@@ -56,3 +56,15 @@ class DeviceCRUD:
     async def get_by_name(self, name:str) -> Device | None:
         result= await self.session.execute(select(Device).where(Device.name==name))
         return result.scalar_one_or_none()
+    
+    async def remove_battery_from_device(self, device_id: int, battery_id: int) -> bool:
+        """Удалить батарею из устройства"""
+        from app.crud.battery import BatteryCRUD
+        
+        battery_crud = BatteryCRUD(self.session)
+        battery = await battery_crud.get(battery_id)
+        
+        if battery and battery.device_id == device_id:
+            return await battery_crud.delete(battery_id)
+        
+        return False

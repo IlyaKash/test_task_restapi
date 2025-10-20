@@ -55,6 +55,9 @@ class BatteryBase(BaseModel):
         if v > 3650:
             raise ValueError('Service life should not exceed 10 years (3650 days)')
         return v
+    
+    class Config:
+        orm_mode = True
 
 
 class BatteryCreate(BatteryBase):

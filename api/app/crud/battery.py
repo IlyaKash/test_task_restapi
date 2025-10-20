@@ -94,7 +94,7 @@ class BatteryCRUD:
         return battery
     
     async def delete(self, battery_id: int) -> bool:
-        battery = await self.get(battery_id)
+        battery = await self.session.get(Battery, battery_id)
         if battery:
             await self.session.delete(battery)
             await self.session.commit()

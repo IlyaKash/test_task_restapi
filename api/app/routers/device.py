@@ -23,7 +23,7 @@ async def create_device(
     db:AsyncSession=Depends(get_async_session)
 ):
     crud=DeviceCRUD(db)
-
+    
     #Проверка на уникальность имени
     existing_device= await crud.get_by_name(device.name)
     if existing_device:
@@ -33,7 +33,7 @@ async def create_device(
         )
     
     try:
-        new_device=await crud.creaet(device)
+        new_device=await crud.create(device)
         return DeviceResponse(
             success=True,
             data=new_device,

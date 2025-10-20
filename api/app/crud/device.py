@@ -8,7 +8,7 @@ class DeviceCRUD:
     def __init__(self, session: AsyncSession):
         self.session=session
     
-    async def creaet(self, device: DeviceCreate) -> Device:
+    async def create(self, device: DeviceCreate) -> Device:
         db_device =  Device(**device.model_dump())
         self.session.add(db_device)
         await self.session.commit()
@@ -73,7 +73,7 @@ class DeviceCRUD:
         return device
     
     async def delete(self, device_id: int) -> bool:
-        device = await self.get(device_id)
+        device = await self.session.get(Device, device_id)
         if device:
             await self.session.delete(device)
             await self.session.commit()

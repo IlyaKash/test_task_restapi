@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import get_async_session
-from schemas.battery import Battery, BatteryCreate, BatteryList, BatteryUpdate, BatteryPatch, BatteryResponse
-from crud.battery import BatteryCRUD
+from app.database import get_async_session
+from app.schemas.battery import Battery, BatteryCreate, BatteryList, BatteryUpdate, BatteryPatch, BatteryResponse
+from app.crud.battery import BatteryCRUD
 
 
 router= APIRouter()
@@ -78,7 +78,7 @@ async def read_battery(
     
     return BatteryResponse(
         success=True,
-        data=Battery
+        data=battery
     )
 
 @router.put(

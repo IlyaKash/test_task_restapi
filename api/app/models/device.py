@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, validates
-from database import Base
+from app.database import Base
 
 class Device(Base):
     """
@@ -27,7 +27,7 @@ class Device(Base):
 
     #Связь с аккумуляторами (ограничение по тз в 5)
     #Relationship with batteries (requirements for 5)
-    battaries= relationship("Battery", back_populates="device", cascade="all, delete-orphan")
+    batteries= relationship("Battery", back_populates="device", cascade="all, delete-orphan")
 
     @validates('batteries')
     def validate_batteries_count(self, key, battery):

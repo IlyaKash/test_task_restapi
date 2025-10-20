@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
-from models.battery import Battery
-from models.device import Device
-from schemas.battery import BatteryCreate, BatteryUpdate, BatteryPatch
+from sqlalchemy.orm import selectinload
+from app.models.battery import Battery
+from app.models.device import Device
+from app.schemas.battery import BatteryCreate, BatteryUpdate, BatteryPatch
 
 class BatteryCRUD:
     def __init__(self, session: AsyncSession):
@@ -26,17 +27,19 @@ class BatteryCRUD:
         return db_battery
     
     async def get(self, battery_id: int) -> Battery | None:
-        result = await self.session.execute(select(Battery).where(Battery.id == battery_id))
+        result = await self.session.execute(select(Battery).where(Battery.id == battery_id).options(selectinload(Battery.device)))
         return result.scalar_one_or_none()
     
     async def get_all(self) -> list[Battery]:
-        result = await self.session.execute(select(Battery))
+        #selectinload - позволяет заранее подгрузить все батареи для устройств одним дополнительным запросом
+        #также делает 1 дополнительный запрос для всех связанных батарей вместо возможных N+1 запросах
+        result = await self.session.execute(select(Battery).options(selectinload(Battery.device)))
         return result.scalars().all()
     
     async def get_by_device(self, device_id: int) -> list[Battery]:
         """Получить все батареи устройства"""
         result = await self.session.execute(
-            select(Battery).where(Battery.device_id == device_id)
+            select(Battery).where(Battery.device_id == device_id).options(selectinload(Battery.device))
         )
         return result.scalars().all()
     
@@ -108,7 +111,7 @@ class BatteryCRUD:
     async def get_low_capacity_batteries(self, threshold: float = 20.0) -> list[Battery]:
         """Получить батареи с низкой емкостью"""
         result = await self.session.execute(
-            select(Battery).where(Battery.residual_capacity < threshold)
+            select(Battery).where(Battery.residual_capacity < threshold).options(selectinload(Battery.device))
         )
         return result.scalars().all()
     

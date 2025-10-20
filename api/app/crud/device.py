@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from models.device import Device
-from schemas.device import DeviceCreate, DevicePatch, DeviceUpdate, DeviceList
+from sqlalchemy.orm import selectinload
+from app.models.device import Device
+from app.schemas.device import DeviceCreate, DevicePatch, DeviceUpdate, DeviceList
 
 class DeviceCRUD:
     def __init__(self, session: AsyncSession):
@@ -12,14 +13,25 @@ class DeviceCRUD:
         self.session.add(db_device)
         await self.session.commit()
         await self.session.refresh(db_device)
+
+        # Предзагрузка батарей
+        result = await self.session.execute(
+            select(Device)
+            .options(selectinload(Device.batteries))
+            .where(Device.id == db_device.id)
+        )
+        db_device = result.scalar_one()
+
         return db_device
     
     async def get(self, device_id: int) -> Device | None:
-        result = await self.session.execute(select(Device).where(Device.id==device_id))
+        result = await self.session.execute(select(Device).where(Device.id==device_id).options(selectinload(Device.batteries)))
         return result.scalar_one_or_none()
     
     async def get_all(self) -> DeviceList:
-        result=await self.session.execute(select(Device))
+        #selectinload - позволяет заранее подгрузить все батареи для устройств одним дополнительным запросом
+        #также делает 1 дополнительный запрос для всех связанных батарей вместо возможных N+1 запросах
+        result=await self.session.execute(select(Device).options(selectinload(Device.batteries)))
         return result.scalars().all()
     
     async def update(self, device_id: int, device_update: DeviceUpdate) -> Device | None:
@@ -30,6 +42,14 @@ class DeviceCRUD:
                 setattr(device, field, value)
             await self.session.commit()
             await self.session.refresh(device)
+        
+        result = await self.session.execute(
+            select(Device)
+            .options(selectinload(Device.batteries))
+            .where(Device.id == device.id)
+        )
+        device = result.scalar_one()
+
         return device
 
     async def patch(self, device_id: int, device_patch: DevicePatch) -> Device | None:
@@ -43,10 +63,17 @@ class DeviceCRUD:
             
             await self.session.commit()
             await self.session.refresh(device)
+
+            result = await self.session.execute(
+                select(Device)
+                .options(selectinload(Device.batteries))
+                .where(Device.id == device.id)
+            )
+            device = result.scalar_one()
         return device
     
     async def delete(self, device_id: int) -> bool:
-        device = await self.session.get(device_id)
+        device = await self.get(device_id)
         if device:
             await self.session.delete(device)
             await self.session.commit()
@@ -54,7 +81,7 @@ class DeviceCRUD:
         return False
     
     async def get_by_name(self, name:str) -> Device | None:
-        result= await self.session.execute(select(Device).where(Device.name==name))
+        result= await self.session.execute(select(Device).where(Device.name==name).options(selectinload(Device.batteries)))
         return result.scalar_one_or_none()
     
     async def remove_battery_from_device(self, device_id: int, battery_id: int) -> bool:

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from routers.battery import router as battery_router
-from routers.device import router as device_router
+from app.routers.battery import router as battery_router
+from app.routers.device import router as device_router
 
 app = FastAPI(
     title="Battery Monitoring API",

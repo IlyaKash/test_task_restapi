@@ -40,6 +40,8 @@ class DeviceBase(BaseModel):
             raise ValueError('Version can only contain alphanumeric characters, dots, hyphens and underscores')
         return v
 
+    class Config:
+        orm_mode = True
 
 class DeviceCreate(DeviceBase):
     pass

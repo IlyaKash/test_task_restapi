@@ -3,11 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import get_async_session
-from schemas.device import Device, DeviceCreate, DevicePatch, DeviceUpdate, DeviceList, DeviceResponse
-from schemas.battery import Battery, BatteryCreate
-from crud.device import DeviceCRUD
-from crud.battery import BatteryCRUD
+from app.database import get_async_session
+from app.schemas.device import Device, DeviceCreate, DevicePatch, DeviceUpdate, DeviceList, DeviceResponse
+from app.schemas.battery import Battery, BatteryCreate
+from app.crud.device import DeviceCRUD
+from app.crud.battery import BatteryCRUD
 
 router= APIRouter()
 

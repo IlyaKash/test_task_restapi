@@ -24,7 +24,7 @@ async def seed_data():
         for d in devices_data:
             existing = await device_crud.get_by_name(d.name)
             if not existing:
-                device = await device_crud.creaet(d)
+                device = await device_crud.create(d)
                 devices.append(device)
                 print(f"Устройство '{device.name}' создано.")
             else:
